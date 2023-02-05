@@ -1,23 +1,12 @@
 package com.group6.tibame104.product.controller;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,12 +21,11 @@ public class ProductGetOne {
 	private ProductService productSvc;
 
 	@GetMapping("/get")
-	public String update(Model model, HttpServletRequest request,
-			HttpServletResponse response,
+	public String update(Model model,
 			@RequestParam("productID") String productIDStr) {
 			
 		
-		Map<String, String> errorMsgs = new LinkedHashMap<String, String>();
+		Map<String, String> errorMsgs = new HashMap<String, String>();
 		model.addAttribute("errorMsgs", errorMsgs);
 
 		if (productIDStr == null || (productIDStr.trim()).length() == 0) {

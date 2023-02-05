@@ -7,33 +7,30 @@ import com.group6.tibame104.product.model.ProductVO;
 
 public interface ProductService_interface {
 
-	/* 插入product */
+	// 1.商品 新增
 	public void insert(ProductVO productVO);
 
-	/* 修改product */
+	// 2.商品 修改
 	public void update(ProductVO productVO);
 
-	/* 根據productID找到product */
+	// 3.根據商品ID找到商品
 	public ProductVO findByPrimaryKey(Integer productID);
 
-	/* 取得所有product */
+	// 4.無條件搜尋商品
 	public List<ProductVO> getAll();
 
-	/* 根據productName取得所有product */
+	// 5.根據商品名稱搜尋商品
 	public List<ProductVO> getAll(String productName);
 
-	/* 找到ID最大值 */
+	// 6.尋找當前最大的商品ID
 	public Integer findMaxID();
-
-	/* 多條件找到所有product */
-	public List<ProductVO> getAllByCond(Map<String, String> queryString);
 	
-	/*多條件找到所有某賣家的product*/
+	// 7.多條件 根據form表單內容查詢商品
 	public List<ProductVO> getAllByCondFront(Map<String, String> queryString);
 	
-	/*上架*/
-	public String putOn(Integer productID);
+	// 8.根據商品ID上架
+	public void putOn(Integer productID);
 	
-	/*下架*/
-	public String putOff(Integer productID);
+	// 9.根據商品ID下架
+	public void putOff(Integer productID);
 }

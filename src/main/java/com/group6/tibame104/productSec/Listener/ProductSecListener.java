@@ -1,25 +1,25 @@
 package com.group6.tibame104.productSec.Listener;
 
-import java.util.List;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 
-import com.group6.tibame104.productSec.model.ProductSecJDBCDAO;
-import com.group6.tibame104.productSec.model.ProductSecVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@WebListener
+import com.group6.tibame104.productSec.model.ProductSecDAO_interface;
+
+@Component
 public class ProductSecListener implements ServletContextListener {
 
-    public void contextDestroyed(ServletContextEvent sce)  { 
-  
-    }
+	@Autowired
+	private ProductSecDAO_interface dao;
 
-    public void contextInitialized(ServletContextEvent sce)  { 
-    	List<ProductSecVO> ProductSecAll = new ProductSecJDBCDAO().getAll();
-    	sce.getServletContext().setAttribute("ProductSec", ProductSecAll);
-//    	System.out.println("ProductSecListener 已經在pageContext載入商品中分類的資料了");
-    }
-	
+	public void contextDestroyed(ServletContextEvent sce) {
+
+	}
+
+	public void contextInitialized(ServletContextEvent sce) {
+		sce.getServletContext().setAttribute("ProductSec", dao.getAll());
+	}
+
 }

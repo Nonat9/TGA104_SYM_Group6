@@ -3,22 +3,59 @@ package com.group6.tibame104.product.model;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+
+@Entity
+@Table(name = "product")
 public class ProductVO implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "productID")
 	private Integer productID;
+	@Column(name = "storeID")
 	private Integer storeID;
+	@NotNull(message="請輸入正確的商品次分類ID")
+	@Column(name = "productSecID")
 	private Integer productSecID;
+	@NotBlank(message = "請輸入正確的商品名稱")
+    @Length(message = "名稱要介於{min}-{max}之間", min= 2,max = 30)
+	@Column(name = "productName")
 	private String productName;
+	@NotNull(message="請輸入正確的商品數量")
+	@Column(name = "productStock")
 	private Integer productStock;
+	@NotNull(message="請輸入正確的商品價格")
+	@Column(name = "productPrice")
 	private Integer productPrice;
+	@NotBlank(message = "請輸入正確的商品描述")
+	@Column(name = "productDesc")
 	private String productDesc;
+	@NotBlank(message = "請輸入正確的商品來源地")
+	@Column(name = "source")
 	private String source;
+	@Column(name = "productImg", columnDefinition = "longblob")
 	private byte[] productImg;
+	@Column(name = "productImg2", columnDefinition = "longblob")
 	private byte[] productImg2;
+	@Column(name = "productImg3", columnDefinition = "longblob")
 	private byte[] productImg3;
+	@Column(name = "insertTime", columnDefinition = "datetime")
 	private Timestamp insertTime;
+	@Column(name = "productStatus",columnDefinition="int")
 	private Boolean productStatus;
+	@Column(name = "commentTotal")
 	private Integer commentTotal;
+	@Column(name = "commentAvgStar")
 	private Double commentAvgStar;
 	
 	public Integer getProductID() {

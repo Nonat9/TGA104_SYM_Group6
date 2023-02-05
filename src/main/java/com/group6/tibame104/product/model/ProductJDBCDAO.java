@@ -1,12 +1,13 @@
 package com.group6.tibame104.product.model;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -131,7 +132,6 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 			try (ResultSet rs = pstmt.executeQuery()) {
 				List<ProductVO> list = new ArrayList<ProductVO>();
 				while (rs.next()) {
-					// empVO 嚙稽嚙誶穿蕭 Domain objects
 
 					ProductVO productVO = new ProductVO();
 					productVO.setProductID(rs.getInt("productID"));
@@ -148,11 +148,10 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 					productVO.setProductStatus(rs.getBoolean("productStatus"));
 					productVO.setCommentTotal(rs.getInt("commentTotal"));
 					productVO.setCommentAvgStar(rs.getDouble("commentTotal"));
-					list.add(productVO); // Store the row in the list
+					list.add(productVO);
 				}
 				return list;
 			}
-			// Handle any driver errors
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -169,7 +168,7 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 			try (ResultSet rs = pstmt.executeQuery()) {
 				List<ProductVO> list = new ArrayList<ProductVO>();
 				while (rs.next()) {
-					// empVO 嚙稽嚙誶穿蕭 Domain objects
+
 					ProductVO productVO = new ProductVO();
 					productVO.setProductID(rs.getInt("productID"));
 					productVO.setStoreID(rs.getInt("storeID"));
@@ -185,11 +184,10 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 					productVO.setProductStatus(rs.getBoolean("productStatus"));
 					productVO.setCommentTotal(rs.getInt("commentTotal"));
 					productVO.setCommentAvgStar(rs.getDouble("commentTotal"));
-					list.add(productVO); // Store the row in the list
+					list.add(productVO);
 				}
 				return list;
 			}
-			// Handle any driver errors
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -208,7 +206,6 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 					return productID;
 				}
 
-				// Handle any driver errors
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -217,15 +214,49 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 	}
 
 	@Override
-	public List<ProductVO> getAllByCond(String quryString) {
+	public List<ProductVO> getAllByCond(Map<String, String> queryString) {
+
+		/*
+		 * 使用StringBuilder 將  querstString其中的內容組成 SQL的where條件
+		 * Map<String, String> key值為參數名稱 value為參數值
+		 * 當前內容如下
+		 * 		where storeID       = storeID的值
+		 *      and   productID     = productID的值
+		 * 		and	  productSecID  = productSecID的值
+		 * 		and	  productStatus = productStatus的值
+		*/ 
+		StringBuilder sb = new StringBuilder();
+		Iterator<Entry<String, String>> it = queryString.entrySet().iterator();
+
+		int i = 0;
+		if (it.hasNext()) {
+			sb.append(" where ");
+		}
+		while (it.hasNext()) {
+			Entry<String, String> next = it.next();
+			if (i > 0) {
+				sb.append(" and ");
+			}
+			if ("storeID".equals(next.getKey())) {
+				sb.append(next.getKey() + " = " + next.getValue());
+			} else if ("productID".equals(next.getKey())) {
+				sb.append(next.getKey() + " = " + next.getValue());
+			} else if ("productSecID".equals(next.getKey())) {
+				sb.append("productSecID" + " = " + next.getValue());
+			} else if ("productStatus".equals(next.getKey())) {
+				sb.append("productStatus" + " = " + next.getValue());
+			}
+			i++;
+		}
+		// 打印 where語句
+		System.out.println(sb);
 
 		try (Connection con = dataSource.getConnection();
-				PreparedStatement pstmt = con.prepareStatement(GET_ALL_STMT + quryString);) {
+				PreparedStatement pstmt = con.prepareStatement(GET_ALL_STMT + sb.toString());) {
 
 			try (ResultSet rs = pstmt.executeQuery()) {
 				List<ProductVO> list = new ArrayList<ProductVO>();
 				while (rs.next()) {
-					// empVO 嚙稽嚙誶穿蕭 Domain objects
 					ProductVO productVO = new ProductVO();
 					productVO.setProductID(rs.getInt("productID"));
 					productVO.setStoreID(rs.getInt("storeID"));
@@ -253,11 +284,8 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 
 	@Override
 	public void putOn(Integer productID) {
-		ProductVO productVO = null;
-
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement pstmt = con.prepareStatement(UPDATE_PUT_ON)) {
-
 			pstmt.setInt(1, productID);
 			pstmt.executeUpdate();
 
@@ -268,8 +296,6 @@ public class ProductJDBCDAO implements ProductDAO_interface {
 
 	@Override
 	public void putOff(Integer productID) {
-		ProductVO productVO = null;
-
 		try (Connection con = dataSource.getConnection();
 				PreparedStatement pstmt = con.prepareStatement(UPDATE_PUT_OFF)) {
 			pstmt.setInt(1, productID);

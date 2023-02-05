@@ -1,7 +1,6 @@
 package com.group6.tibame104.product.controller;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,8 @@ public class ProductSearchProduct {
 			@RequestParam(value = "productSecID", required = false) String productSecIDStr,
 			String productStatus) {
 
-		List<String> errorMsgs = new LinkedList<String>();
+		// 錯誤處理
+		Map<String,String> errorMsgs = new HashMap<String, String>();
 		model.addAttribute("errorMsgs", errorMsgs);
 
 		/* queryString */
@@ -44,7 +44,7 @@ public class ProductSearchProduct {
 			productID = Integer.valueOf(productIDStr.trim());
 			queryString.put("productID", productID + "");
 		} catch (Exception e) {
-			System.out.println("錯誤");
+
 		}
 
 		Integer productSecID = null;
@@ -52,7 +52,7 @@ public class ProductSearchProduct {
 			productSecID = Integer.valueOf(productSecIDStr.trim());
 			queryString.put("productSecID", productSecID + "");
 		} catch (Exception e) {
-			System.out.println("錯誤");
+
 		}
 
 		queryString.put("productStatus", productStatus);

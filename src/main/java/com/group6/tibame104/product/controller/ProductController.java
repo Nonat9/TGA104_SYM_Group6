@@ -1,38 +1,32 @@
 package com.group6.tibame104.product.controller;
 
-import java.io.File;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 
-import com.group6.tibame104.group.model.GroupService;
-import com.group6.tibame104.group.model.GroupVO;
 import com.group6.tibame104.product.model.ProductVO;
 import com.group6.tibame104.product.service.ProductService;
-import com.group6.tibame104.product.service.ProductService_interface;
 import com.group6.tibame104.store.model.StoreVO;
 
 @Controller
@@ -44,31 +38,31 @@ public class ProductController {
 
 	@PostMapping("/getOne_For_Display")
 	public String getOneForDisplay(Model model, @RequestParam("productID") String str) {
-		List<String> errorMsgs = new LinkedList<String>();
+		/* 錯誤處理 */
+		Map<String, String> errorMsgs = new HashMap<String, String>();
 		model.addAttribute("errorMsgs", errorMsgs);
+
 		if (str == null || (str.trim()).length() == 0) {
-			errorMsgs.add("請輸入正常的數字");
-		}
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/product/addProduct.jsp";
+			errorMsgs.put("productID", "請輸入正常的數字");
 		}
 
 		Integer productID = null;
 		try {
 			productID = Integer.valueOf(str);
 		} catch (Exception e) {
-			errorMsgs.add("請輸入正常的數字");
-		}
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/product/addProduct";
+			errorMsgs.put("productID", "請輸入正常的數字");
 		}
 
 		ProductVO productVO = productSvc.findByPrimaryKey(productID);
 		if (productVO == null) {
-			errorMsgs.add("查無資料");
+			errorMsgs.put("productID", "查無資料");
 		}
+
+		/*
+		 * 如果報錯 轉去 Error 頁面
+		 */
 		if (!errorMsgs.isEmpty()) {
-			return "front-end/product/addProduct";
+			return "front-end/store/Error";
 		}
 
 		model.addAttribute("productVO", productVO);
@@ -77,115 +71,57 @@ public class ProductController {
 	}
 
 	@PostMapping("/insert")
-	public String insert(Model model, HttpServletRequest request, @RequestParam("productName") String productName,
-			@RequestParam("productSec") String productSecStr, @RequestParam("productStock") String productStockStr,
-			@RequestParam("productPrice") String productPriceStr, @RequestParam("productDesc") String productDesc,
-			@RequestParam("source") String source, @RequestParam("productStatus") String productStatusStr) throws IOException, ServletException {
+	public String insert(Model model, @Valid ProductVO productVO, BindingResult bindingResult, HttpSession session,
+			@RequestPart(name = "upfile1", required = false) Part productImg,
+			@RequestPart(name = "upfile2", required = false) Part productImg2,
+			@RequestPart(name = "upfile3", required = false) Part productImg3) throws IOException {
 
-		List<String> errorMsgs = new LinkedList<String>();
+		/* 錯誤處理 */
+		Map<String, String> errorMsgs = new HashMap<String, String>();
 		model.addAttribute("errorMsgs", errorMsgs);
 
-		HttpSession session = request.getSession();
-		StoreVO attribute = (StoreVO) session.getAttribute("storeVO2");
-		Integer storeID = attribute.getStoreID();
-
-		/* 1. 請求參數的格式整理 */
-
-		String productNameReg = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$";
-		if (productName == null || productName.trim().length() == 0) {
-			errorMsgs.add("產品名稱: 請勿空白");
-		} else if (!productName.trim().matches(productNameReg)) {
-			errorMsgs.add("產品名稱: 只能是中 英字母 數字 _ , 且長度介於2-10之間");
-		}
-
-		Integer productSec = null;
-		try {
-			productSec = Integer.valueOf(productSecStr.trim());
-		} catch (NumberFormatException e) {
-			productSec = 0;
-			errorMsgs.add("商品次分類不正確");
-		}
-
-		Integer productStock = null;
-		try {
-			productStock = Integer.valueOf(productStockStr.trim());
-		} catch (NumberFormatException e) {
-			productStock = 0;
-			errorMsgs.add("庫存請填數字");
-		}
-
-		Integer productPrice = null;
-		try {
-			productPrice = Integer.valueOf(productPriceStr.trim());
-		} catch (NumberFormatException e) {
-			productPrice = 0;
-			errorMsgs.add("商品價格請填數字");
-		}
-
-		if (productDesc == null || productDesc.trim().length() == 0) {
-			errorMsgs.add("產品描述: 請勿空白");
-		}
-
-		if (source == null || source.trim().length() == 0) {
-			errorMsgs.add("產地: 請勿空白");
-		}
-
-		Integer productStatusInt = null;
-		try {
-			productStatusInt = Integer.valueOf(productStatusStr.trim());
-		} catch (NumberFormatException e) {
-			errorMsgs.add("商品狀態請填寫正確");
-		}
-
-		Boolean productStatus = null;
-
-		if (new Integer(1).equals(productStatusInt)) {
-			productStatus = true;
-		} else {
-			productStatus = false;
-		}
-
-		/* 圖片1 */
-		Collection<Part> parts = request.getParts();
-
-		List<String> pList = new ArrayList<String>();
-		List<byte[]> bList = new ArrayList<byte[]>();
-		for (Part part : parts) {
-			String filename = part.getSubmittedFileName();
-			if (filename != null && filename.length() != 0 && part.getContentType() != null) {
-				InputStream inputStream = part.getInputStream();
-				pList.add(part.getName());
-				bList.add(inputStream.readAllBytes());
+		if (bindingResult != null && bindingResult.hasFieldErrors()) {
+			/*
+			 * 自動轉換錯誤 加入errorMsgs
+			 */
+			if (bindingResult.hasFieldErrors("productSecID")) {
+				errorMsgs.put("productSecID", "請輸入正確的商品分類");
 			}
+			if (bindingResult.hasFieldErrors("productStock")) {
+				errorMsgs.put("productStock", "請輸入正確的商品數量");
+			}
+			if (bindingResult.hasFieldErrors("productPrice")) {
+				errorMsgs.put("productPrice", "請輸入正確的商品價格");
+			}
+			if (bindingResult.hasFieldErrors("productDesc")) {
+				errorMsgs.put("productStatus", "請輸入正確的商品上下架狀態");
+			}
+
+			/*
+			 * 非自動轉換失敗的錯誤 也就是我用constraint自定義的錯誤 加入errorMsgs
+			 */
+			for (FieldError s : bindingResult.getFieldErrors()) {
+				if (!errorMsgs.keySet().contains(s.getField())) {
+					errorMsgs.put(s.getField(), s.getDefaultMessage());
+				}
+			}
+			for (String key : errorMsgs.keySet()) {
+				System.out.println(errorMsgs.get(key));
+			}
+
 		}
 
-		/* 圖片2 */
-		ProductVO productVO = new ProductVO();
-		productVO.setStoreID(storeID);
-		productVO.setProductSecID(productSec);
-		productVO.setProductName(productName);
-		productVO.setProductStock(productStock);
-		productVO.setProductPrice(productPrice);
-		productVO.setProductDesc(productDesc);
-		productVO.setSource(source);
+		/* 取得賣場ID */
+		StoreVO attribute = (StoreVO) session.getAttribute("storeVO2");
+		productVO.setStoreID(attribute.getStoreID());
 
-		if (pList.contains("upfile1")) {
-			productVO.setProductImg(bList.get(pList.indexOf("upfile1")));
-		}
-		if (pList.contains("upfile2")) {
-			productVO.setProductImg2(bList.get(pList.indexOf("upfile2")));
-		}
-		if (pList.contains("upfile3")) {
-			productVO.setProductImg3(bList.get(pList.indexOf("upfile3")));
-		}
-
-		productVO.setProductStatus(productStatus);
-		productVO.setCommentTotal(0);
-		productVO.setCommentAvgStar(0.0);
-
-		// Send the use back to the form, if there were errors
+		/* 圖片 */
+		productVO.setProductImg(productImg.getInputStream().readAllBytes());
+		productVO.setProductImg2(productImg2.getInputStream().readAllBytes());
+		productVO.setProductImg3(productImg3.getInputStream().readAllBytes());
+	
 		/*
-		 * 如果報錯 轉去 addProduct 頁面
+		 * 如果報錯 轉去 Error 頁面
 		 */
 		if (!errorMsgs.isEmpty()) {
 			model.addAttribute("productVO", productVO); // 含有輸入格式錯誤的empVO物件,也存入req
@@ -209,7 +145,10 @@ public class ProductController {
 	public String update(Model model, HttpServletRequest request, @RequestParam("productID2") String productIDStr,
 			@RequestParam("productName") String productName, @RequestParam("productSec") String productSecStr,
 			@RequestParam("productStock") String productStockStr, @RequestParam("productPrice") String productPriceStr,
-			@RequestParam("productDesc") String productDesc, @RequestParam("source") String source) throws IOException, ServletException {
+			@RequestParam("productDesc") String productDesc, @RequestParam("source") String source,
+			@RequestPart(name = "upfile1", required = false) Part productImg,
+			@RequestPart(name = "upfile2", required = false) Part productImg2,
+			@RequestPart(name = "upfile3", required = false) Part productImg3) throws IOException {
 
 		List<String> errorMsgs = new LinkedList<String>();
 		model.addAttribute("errorMsgs", errorMsgs);
@@ -262,20 +201,7 @@ public class ProductController {
 			errorMsgs.add("產地: 請勿空白");
 		}
 
-		Collection<Part> parts = request.getParts();
-
-		List<String> pList = new ArrayList<String>();
-		List<byte[]> bList = new ArrayList<byte[]>();
-		for (Part part : parts) {
-			String filename = part.getSubmittedFileName();
-			if (filename != null && filename.length() != 0 && part.getContentType() != null) {
-				InputStream inputStream = part.getInputStream();
-				pList.add(part.getName());
-				bList.add(inputStream.readAllBytes());
-			}
-		}
-
-		/* 圖片2 */
+		/* 放入Bean */
 		ProductVO productVO = new ProductVO();
 		productVO.setProductID(productID);
 		productVO.setProductSecID(productSec);
@@ -284,28 +210,50 @@ public class ProductController {
 		productVO.setProductPrice(productPrice);
 		productVO.setProductDesc(productDesc);
 		productVO.setSource(source);
+
+		/* 配合SQL函數coalesce
+		 * productImg的size為0 則塞productImg_=null
+		 * productImg的size不為0 則productImg_讀入productImg
+		 * */
+		byte[] productImg_ = null;
 		
-		ProductVO findByPrimaryKey = productSvc.findByPrimaryKey(productID);
+		if (productImg.getSize() != 0) {
+			InputStream in = productImg.getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(in);
+			productImg_ = new byte[bis.available()];
+			bis.read(productImg_);
+		}
+		productVO.setProductImg(productImg_);
+		
+		/* 配合SQL函數coalesce
+		 * productImg2的size為0 則塞productImg2_=null
+		 * productImg2的size不為0 則productImg2_讀入productImg2
+		 * */
+		byte[] productImg2_ = null;
+		
+		if (productImg2.getSize() != 0) {
+			InputStream in2 = productImg2.getInputStream();
+			BufferedInputStream bis2 = new BufferedInputStream(in2);
+			productImg2_ = new byte[bis2.available()];
+			bis2.read(productImg2_);
+		}
+		productVO.setProductImg2(productImg2_);
+		
+		/* 配合SQL函數coalesce
+		 * productImg3的size為0 則塞productImg3_=null
+		 * productImg3的size不為0 則productImg3_讀入productImg3
+		 * */
+		byte[] productImg3_ = null;
+		
+		if (productImg3.getSize() != 0) {
+			InputStream in3 = productImg3.getInputStream();
+			BufferedInputStream bis3 = new BufferedInputStream(in3);
+			productImg3_ = new byte[bis3.available()];
+			bis3.read(productImg3_);
+		}
+		productVO.setProductImg3(productImg3_);
+		
 
-		if (pList.contains("upfile1")) {
-			productVO.setProductImg(bList.get(pList.indexOf("upfile1")));
-		}else {
-			productVO.setProductImg(findByPrimaryKey.getProductImg());
-		}
-		if (pList.contains("upfile2")) {
-			productVO.setProductImg2(bList.get(pList.indexOf("upfile2")));
-		}else {
-			productVO.setProductImg(findByPrimaryKey.getProductImg());
-		}
-		if (pList.contains("upfile3")) {
-			productVO.setProductImg3(bList.get(pList.indexOf("upfile3")));
-		}else {
-			productVO.setProductImg(findByPrimaryKey.getProductImg());
-		}
-		productVO.setCommentTotal(0);
-		productVO.setCommentAvgStar(0.0);
-
-		// Send the use back to the form, if there were errors
 		/*
 		 * 如果報錯 轉去 Error 頁面
 		 */
@@ -324,215 +272,6 @@ public class ProductController {
 		model.addAttribute("productVO", productVO);
 		return "front-end/store/myStore";
 
-	}
-
-	@PostMapping("/getAll_For_Display")
-	public String getAllForDisplay(Model model, HttpServletRequest request,
-			@RequestParam("productName") String productName) {
-
-		Map<String, String> errorMsgs = new LinkedHashMap<String, String>();
-		model.addAttribute("errorMsgs", errorMsgs);
-
-		/*
-		 * 商品名稱取值
-		 */
-
-		List<ProductVO> productVOall;
-
-		/*
-		 * 搜尋 商品名稱 為空 全部 不為空 有條件
-		 */
-		if (productName.trim().length() == 0) {
-			productVOall = productSvc.getAll();
-		} else {
-			productVOall = productSvc.getAll(productName);
-		}
-
-		/*
-		 * 如果報錯 轉去 addProduct 頁面
-		 */
-
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/product/addProduct.jsp";
-		}
-
-		/*
-		 * 轉去 listAllProduct 頁面
-		 */
-		model.addAttribute("productVOall", productVOall);
-		return "front-end/product/listAllProduct";
-	}
-
-	@PostMapping("/getAll_For_More_Display")
-	public String getAllForMoreDisplay(Model model, HttpServletRequest request,
-			@RequestParam("storeID") String storeIDStr, @RequestParam("productID") String productIDStr,
-			@RequestParam("productID2") String productIDStr2, @RequestParam("productName") String productName,
-			@RequestParam("productSecID") String productSecIDStr, @RequestParam("productStock") String productStockStr,
-			@RequestParam("productStock2") String productStockStr2,
-			@RequestParam("productPrice") String productPriceStr,
-			@RequestParam("productPrice2") String productPriceStr2,
-			@RequestParam("productStatus") String productStatusStr) {
-
-		List<String> errorMsgs = new LinkedList<String>();
-		model.addAttribute("errorMsgs", errorMsgs);
-		Map<String, String> queryString = new LinkedHashMap<String, String>();
-
-		/* 1. 請求參數的格式整理 */
-		Integer storeID = null;
-		if (storeIDStr.trim().length() != 0) {
-			try {
-				storeID = Integer.valueOf(storeIDStr.trim());
-			} catch (NumberFormatException e) {
-				storeID = 0;
-				errorMsgs.add("商店ID不正確");
-			}
-			if (storeID != 0) {
-				queryString.put("storeID", "" + storeID);
-			}
-
-		}
-
-		Integer productID = null;
-		if (productIDStr.trim().length() != 0) {
-			try {
-				productID = Integer.valueOf(productIDStr.trim());
-			} catch (NumberFormatException e) {
-				productID = 0;
-				errorMsgs.add("商品ID不正確");
-			}
-			if (productID != 0) {
-				queryString.put("productID", "" + productID);
-			}
-		}
-
-		Integer productID2 = null;
-		if (productIDStr2.trim().length() != 0) {
-			try {
-				productID2 = Integer.valueOf(productIDStr2.trim());
-			} catch (NumberFormatException e) {
-				productID2 = 0;
-				errorMsgs.add("商品ID不正確");
-			}
-			if (productID2 != 0) {
-				queryString.put("productID2", "" + productID2);
-			}
-		}
-
-		String productNameReg = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$";
-		if (productName != null && productName.trim().length() != 0) {
-			if (!productName.trim().matches(productNameReg)) {
-				errorMsgs.add("產品名稱: 只能是中 英字母 數字 _ , 且長度介於2-10之間");
-			} else {
-				queryString.put("productName", "" + productName);
-			}
-		}
-
-		Integer productSecID = null;
-
-		if (productSecIDStr.trim().length() != 0 && !("selected".equals(productSecIDStr))) {
-			try {
-				productSecID = Integer.valueOf(productSecIDStr.trim());
-			} catch (NumberFormatException e) {
-				productSecID = 0;
-				errorMsgs.add("商品次分類不正確");
-			}
-			if (productSecID != 0) {
-				queryString.put("productSecID", "" + productSecID);
-			}
-		}
-
-		Integer productStock = null;
-		if (productStockStr.length() != 0) {
-			try {
-				productStock = Integer.valueOf(productStockStr.trim());
-			} catch (NumberFormatException e) {
-				productStock = 0;
-				errorMsgs.add("庫存請填數字");
-			}
-			if (productStock != 0) {
-				queryString.put("productStock", "" + productStock);
-			}
-		}
-
-		Integer productStock2 = null;
-		if (productStockStr2.trim().length() != 0) {
-			try {
-				productStock2 = Integer.valueOf(productStockStr2.trim());
-			} catch (NumberFormatException e) {
-				productStock2 = 0;
-				errorMsgs.add("庫存請填數字");
-			}
-			if (productStock2 != 0) {
-				queryString.put("productStock2", "" + productStock2);
-			}
-		}
-
-		Integer productPrice = null;
-		if (productPriceStr.trim().length() != 0) {
-			try {
-				productPrice = Integer.valueOf(productPriceStr.trim());
-			} catch (NumberFormatException e) {
-				productPrice = 0;
-				errorMsgs.add("商品價格請填數字");
-			}
-			if (productPrice != 0) {
-				queryString.put("productPrice", "" + productPrice);
-			}
-		}
-
-		Integer productPrice2 = null;
-		if (productPriceStr2.trim().length() != 0) {
-			try {
-				productPrice2 = Integer.valueOf(productPriceStr2.trim());
-			} catch (NumberFormatException e) {
-				productPrice2 = 0;
-				errorMsgs.add("商品價格請填數字");
-			}
-			if (productPrice2 != 0) {
-				queryString.put("productPrice2", "" + productPrice2);
-			}
-		}
-
-		Integer productStatusInt = null;
-		Boolean productStatus = null;
-		if (productStatusStr.trim().length() != 0 && !("selected".equals(productStatusStr))) {
-			try {
-				productStatusInt = Integer.valueOf(productStatusStr.trim());
-			} catch (NumberFormatException e) {
-				errorMsgs.add("商品狀態請填寫正確");
-			}
-			if (new Integer(1).equals(productStatusInt)) {
-				productStatus = true;
-			} else {
-				productStatus = false;
-			}
-			queryString.put("productStatus", "" + productStatus);
-		}
-
-		/*
-		 * 商品名稱取值
-		 * 
-		 * 
-		 * List<ProductVO> productVOall;
-		 * 
-		 * /* 搜尋 商品名稱 為空 全部 不為空 有條件
-		 */
-
-		List<ProductVO> productVOall = productSvc.getAllByCond(queryString);
-
-		/*
-		 * 如果報錯 轉去 addProduct 頁面
-		 */
-
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/product/addProduct.jsp";
-		}
-
-		/*
-		 * 轉去 listAllProduct 頁面
-		 */
-		model.addAttribute("productVOall", productVOall);
-		return "front-end/product/listAllProduct";
 	}
 
 }

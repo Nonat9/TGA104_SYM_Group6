@@ -23,4 +23,4 @@ spring:
 
 server:
   servlet:
-    context-path: /TGA104_SYM_Group6
+    context-path: /TGA104_SYM_Boot

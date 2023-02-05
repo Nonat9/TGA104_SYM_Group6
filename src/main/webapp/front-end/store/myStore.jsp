@@ -142,21 +142,21 @@
 				<div class="col-md-3">
 					<div class="nav flex-column nav-pills" role="tablist"
 						aria-orientation="vertical">
-						<a class="nav-link active"><i class="fa fa-tachometer-alt"></i>賣場管理Header</a>
+						<a class="nav-link active"><i class="fa fa-tachometer-alt"></i>賣場管理</a>
 						<a class="nav-link" id="orders-nav" data-toggle="pill"
 							href="#storeReview" role="tab"><i class="fa fa-shopping-bag"></i>賣場評價</a>
 						<a class="nav-link" id="orders-nav" data-toggle="pill"
 							href="#storeintroduction" role="tab"><i
 							class="fa fa-shopping-bag"></i>賣場介紹</a> <a class="nav-link"><i
-							class="fa fa-credit-card"></i>商品管理Header</a> <a class="nav-link"
+							class="fa fa-credit-card"></i>商品管理</a> <a class="nav-link"
 							id="address-nav" data-toggle="pill" href="#myProduct" role="tab"><i
 							class="fa fa-map-marker-alt"></i>我的商品</a> <a class="nav-link"
 							id="account-nav" data-toggle="pill" href="#addProduct" role="tab"><i
 							class="fa fa-user"></i>新增商品</a> <a class="nav-link"><i
-							class="fa fa-user"></i>財務管理Header</a> <a class="nav-link"
+							class="fa fa-user"></i>財務管理</a> <a class="nav-link"
 							id="account-nav" data-toggle="pill" href="#orderQuery" role="tab"><i
 							class="fa fa-user"></i>查詢訂單</a> <a class="nav-link"><i
-							class="fa fa-user"></i>客服中心Header</a> <a class="nav-link"
+							class="fa fa-user"></i>客服中心</a> <a class="nav-link"
 							id="account-nav" data-toggle="pill" href="#account-tab"
 							role="tab"><i class="fa fa-user"></i>平台幫助中心</a> <a
 							class="nav-link" href="index.html"><i
@@ -356,7 +356,7 @@
 									</div>
 									<div>
 										商品次分類： <select class="form-select mb-3"
-											aria-label="Default select example" name="productSec">
+											aria-label="Default select example" name="productSecID">
 											<option selected>請選擇</option>
 											<c:forEach var="productSecVO" items="${ProductSec}">
 												<option value="${productSecVO.productSecID}">${productSecVO.productSecName}</option>
