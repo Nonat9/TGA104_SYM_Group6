@@ -39,7 +39,53 @@
 	href="${pageContext.request.contextPath}/front-end/store/css/style.css"
 	rel="stylesheet" />
 <script src="${pageContext.request.contextPath}/JQ/jquery-3.6.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/JQ/jquery.validate.min.js"></script>
+<script src="${pageContext.request.contextPath}/JQ/messages_zh_TW.js"></script>
 <script>
+$().ready(function() {
+	  $("#productForm").validate({
+		    rules: {
+		    	productName:{
+		    		required: true,
+		    		rangelength:[2,20]
+		      	},
+		      	productStock:{
+		      		required:true,
+		      		min:1,
+		      		max:100000
+		      	},
+				productPrice:{
+					required:true,
+		      		min:1,
+		      		max:1000000
+		      	},
+		      	productDesc:"required",
+		      	source:"required",
+		    },
+		    messages: {
+		    	productName:{
+		    		required: "請輸入商品名稱",
+	    			rangelength:"請輸入長度為2-20的商品名稱"
+		    	},
+				productStock:{
+					required:"請輸入商品數量",
+					min:"商品數量最小值為1",
+					max:"商品數量最大直為100000"
+		      	},
+				productPrice:{
+					required:"請輸入商品價格",
+					min:"商品價格最小值為1",
+					max:"商品價格最大直為1000000"
+		      	},
+		    	productDesc:"請輸入商品描述",
+		    	source:"請輸入商品出貨地",
+		    },
+		    submitHandler: function(form) {
+		    	 alert("提交表單");
+		    	 form.submit();
+		    }
+	   })
+});
 	$(function() {
 		var id = $("#id").val();
 		console.log(id);
@@ -96,6 +142,11 @@
 						});
 	})
 </script>
+<style>
+.error{
+	color:red;
+}
+</style>
 </head>
 <body bgcolor='white'>
 	<%@ include file="/front-end/store/Header.jsp"%>
@@ -103,7 +154,7 @@
 		<div class="row">
 			<div class="col-md-5"></div>
 			<div class="col-md-7">
-				<FORM METHOD="post"
+				<FORM id="productForm" METHOD="post"
 					ACTION="${pageContext.request.contextPath}/product/productServlet/update"
 					enctype="multipart/form-data">
 					<div>
@@ -140,7 +191,7 @@
 					</div>
 					<div>
 						<label>商品價格：</label> <input type="text"
-							value="${productVO.productPrice}" id="p_count"
+							value="${productVO.productPrice}" id="p_price"
 							class="btn btn-secondary m-2" name="productPrice" /> <span
 							id="p_count_value"></span>
 					</div>
@@ -182,7 +233,6 @@
 	<a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
 
 	<!-- JavaScript Libraries -->
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<script
 		src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 	<script

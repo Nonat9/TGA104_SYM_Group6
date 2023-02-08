@@ -4,9 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -150,7 +147,7 @@ public class ProductController {
 			@RequestPart(name = "upfile2", required = false) Part productImg2,
 			@RequestPart(name = "upfile3", required = false) Part productImg3) throws IOException {
 
-		List<String> errorMsgs = new LinkedList<String>();
+		Map<String,String> errorMsgs = new HashMap<String,String>();
 		model.addAttribute("errorMsgs", errorMsgs);
 
 		/* 1. 請求參數的格式整理 */
@@ -159,14 +156,14 @@ public class ProductController {
 			productID = Integer.valueOf(productIDStr.trim());
 		} catch (NumberFormatException e) {
 			productID = 0;
-			errorMsgs.add("productID不正確");
+			errorMsgs.put("productID","productID不正確");
 		}
 
-		String productNameReg = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$";
+		String productNameReg = "^.{2,20}$";
 		if (productName == null || productName.trim().length() == 0) {
-			errorMsgs.add("產品名稱: 請勿空白");
+			errorMsgs.put("productName","產品名稱: 請勿空白");
 		} else if (!productName.trim().matches(productNameReg)) {
-			errorMsgs.add("產品名稱: 只能是中 英字母 數字 _ , 且長度介於2-10之間");
+			errorMsgs.put("productName","產品名稱: 長度介於2-20之間");
 		}
 
 		Integer productSec = null;
@@ -174,7 +171,7 @@ public class ProductController {
 			productSec = Integer.valueOf(productSecStr.trim());
 		} catch (NumberFormatException e) {
 			productSec = 0;
-			errorMsgs.add("商品次分類不正確");
+			errorMsgs.put("productSec","商品次分類不正確");
 		}
 
 		Integer productStock = null;
@@ -182,7 +179,7 @@ public class ProductController {
 			productStock = Integer.valueOf(productStockStr.trim());
 		} catch (NumberFormatException e) {
 			productStock = 0;
-			errorMsgs.add("庫存請填數字");
+			errorMsgs.put("productStock","庫存請填數字");
 		}
 
 		Integer productPrice = null;
@@ -190,15 +187,15 @@ public class ProductController {
 			productPrice = Integer.valueOf(productPriceStr.trim());
 		} catch (NumberFormatException e) {
 			productPrice = 0;
-			errorMsgs.add("商品價格請填數字");
+			errorMsgs.put("productPrice","商品價格請填數字");
 		}
 
 		if (productDesc == null || productDesc.trim().length() == 0) {
-			errorMsgs.add("產品描述: 請勿空白");
+			errorMsgs.put("productDesc","產品描述: 請勿空白");
 		}
 
 		if (source == null || source.trim().length() == 0) {
-			errorMsgs.add("產地: 請勿空白");
+			errorMsgs.put("source","產地: 請勿空白");
 		}
 
 		/* 放入Bean */

@@ -85,32 +85,43 @@ public class ProductHibernateDAO implements ProductDAO_interface {
 		Root<ProductVO> root = criteriaQuery.from(ProductVO.class);
 
 		/*
-		 * 使用List<Predicate> 將  querstString其中的內容組成 SQL的where條件
-		 * Map<String, String> key值為參數名稱 value為參數值
-		 * 當前內容如下
-		 * 		where storeID       = storeID的值
-		 * 	    and   productID     = productID的值
-		 * 		and	  productSecID  = productSecID的值
-		 * 		and	  productStatus = productStatus的值
+		 * 使用List<Predicate> 將 querstString其中的內容組成 SQL的where條件 Map<String, String>
+		 * key值為參數名稱 value為參數值 當前內容如下 where storeID = storeID的值 and productName like %?%
+		 * and productID = productID的值 and productSecID = productSecID的值 and
+		 * productStock >= productStock的值 and productStock <= productStock2的值and
+		 * productPrice >= productPrice的值 and productPrice <= productPrice2的值and
+		 * productStatus = productStatus的值
 		 * 
-		*/ 
+		 */
 		List<Predicate> predicateList = new ArrayList<Predicate>();
 		for (String key : queryString.keySet()) {
 			String value = queryString.get(key);
 
 			if ("storeID".equals(key)) {
 				predicateList.add(criteriaBuilder.equal(root.get("storeID"), value));
+			} else if ("productName".equals(key)) {
+				predicateList.add(criteriaBuilder.like(root.get("productName"), "%" + value + "%"));
 			} else if ("productID".equals(key)) {
 				predicateList.add(criteriaBuilder.equal(root.get("productID"), value));
 			} else if ("productSecID".equals(key)) {
 				predicateList.add(criteriaBuilder.equal(root.get("productSecID"), value));
+			} else if ("productStock".equals(key)) {
+				predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("productStock"), value));
+			} else if ("productStock2".equals(key)) {
+				predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("productStock"), value));
+			} else if ("productPrice".equals(key)) {
+				predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("productPrice"), value));
+			} else if ("productPrice2".equals(key)) {
+				predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("productPrice"), value));
 			} else if ("productStatus".equals(key)) {
 				predicateList.add(criteriaBuilder.equal(root.get("productStatus"), Boolean.valueOf(value)));
 			}
 		}
 
 		// 把條件塞入where
-		if (predicateList.size() > 0) {
+		if (predicateList.size() > 0)
+
+		{
 			Predicate[] predicates = new Predicate[predicateList.size()];
 			for (int i = 0; i < predicateList.size(); i++) {
 				predicates[i] = predicateList.get(i);

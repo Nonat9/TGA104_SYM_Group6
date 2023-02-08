@@ -208,15 +208,15 @@ CREATE TABLE member (
 INSERT INTO member (userAccount,userPassword,userName,mail,gender,registrationTime,mailCertification,sellerAuditApprovalState,currentShoppingCoin) 
 VALUES('A123456','aaaaaa','與決','tibame13@gmail.com','M',now(),0,0,0);
 INSERT INTO member (userAccount,userPassword,userName,mail,gender,registrationTime,mailCertification,sellerAuditApprovalState,currentShoppingCoin) 
-VALUES('B123456','aaaaaa','土豪','tibame13@gmail.com','M',now(),0,0,0);
+VALUES('B123456','aaaaaa','土豪','tibame14@gmail.com','M',now(),0,0,0);
 INSERT INTO member (userAccount,userPassword,userName,mail,gender,registrationTime,mailCertification,sellerAuditApprovalState,currentShoppingCoin) 
-VALUES('C123456','aaaaaa','企鵝','tibame13@gmail.com','M',now(),0,0,0);
+VALUES('C123456','aaaaaa','企鵝','tibame15@gmail.com','M',now(),0,0,0);
 INSERT INTO member (userAccount,userPassword,userName,mail,gender,registrationTime,mailCertification,sellerAuditApprovalState,currentShoppingCoin) 
-VALUES('D123456','aaaaaa','議員','tibame13@gmail.com','M',now(),0,0,0);
+VALUES('D123456','aaaaaa','議員','tibame16@gmail.com','M',now(),0,0,0);
 INSERT INTO member (userAccount,userPassword,userName,mail,gender,registrationTime,mailCertification,sellerAuditApprovalState,currentShoppingCoin) 
-VALUES('E123456','aaaaaa','彥峰','tibame13@gmail.com','M',now(),0,0,0);
+VALUES('E123456','aaaaaa','彥峰','tibame17@gmail.com','M',now(),0,0,0);
 INSERT INTO member (userAccount,userPassword,userName,mail,gender,registrationTime,mailCertification,sellerAuditApprovalState,currentShoppingCoin) 
-VALUES('F123456','aaaaaa','彥和','tibame13@gmail.com','M',now(),0,0,0);
+VALUES('F123456','aaaaaa','彥和','tibame18@gmail.com','M',now(),0,0,0);
 
 
 

@@ -37,11 +37,85 @@
 	href="${pageContext.request.contextPath}/front-end/store/css/style.css"
 	rel="stylesheet" />
 <script src="${pageContext.request.contextPath}/JQ/jquery-3.6.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/JQ/jquery.validate.min.js"></script>
+<script src="${pageContext.request.contextPath}/JQ/messages_zh_TW.js"></script>
 
 
-<!-- 企鵝開始 -->
-<script src="${pageContext.request.contextPath}/JQ/jquery-3.6.1.min.js"></script>
 <script>
+$().ready(function() {
+	  $("#the_form").validate({
+		    rules: {
+		    	productName:{
+		    		required: true,
+		    		rangelength:[2,20]
+		      	},
+		      	productStock:{
+		      		required:true,
+		      		min:1,
+		      		max:100000
+		      	},
+				productPrice:{
+					required:true,
+		      		min:1,
+		      		max:1000000
+		      	},
+		      	productDesc:"required",
+		      	source:"required",
+	  			productSecID:"required",
+	  			productStatus:"required"
+		    },
+		    messages: {
+		    	productName:{
+		    		required: "請輸入商品名稱",
+	    			rangelength:"請輸入長度為2-20的商品名稱"
+		    	},
+				productStock:{
+					required:"請輸入商品數量",
+					min:"商品數量最小值為1",
+					max:"商品數量最大直為100000"
+		      	},
+				productPrice:{
+					required:"請輸入商品價格",
+					min:"商品價格最小值為1",
+					max:"商品價格最大直為1000000"
+		      	},
+		    	productDesc:"請輸入商品描述",
+		    	source:"請輸入商品出貨地",
+		    	productSecID:"請輸入商品次分類",
+		    	productStatus:"請輸入商品上下架狀態"
+		    },
+		    submitHandler: function(form) {
+		    	 alert("提交表單");
+		    	 form.submit();
+		    }
+	   })
+});
+
+
+$().ready(function() {
+	  $("#storeForm").validate({
+		    rules: {
+	  			storeName:"required",
+	  			storeDelBank:"required",
+	  			storeBankAccount:"required",
+	  			storeAddress:"required",
+	  			phoneNumber:"required",
+	  			taxID:"required"
+		    },
+		    messages: {
+		    	storeName:"請輸入賣場名稱",
+		    	storeDelBank:"請輸入賣場銀行代碼",
+		    	storeBankAccount:"請輸入賣場銀行帳號",
+		    	storeAddress:"請輸入賣場地址",
+		    	phoneNumber:"請輸入賣場電話",
+		    	taxID:"請輸入稅務代號"
+		    },
+		    submitHandler: function(form) {
+		    	 alert("提交表單");
+		    	 form.submit();
+		    }
+	   })
+});
 	$(function() {
 		var template = 
 		`<table class="table table-striped col-sm-12">
@@ -110,14 +184,17 @@
 										url : "${pageContext.request.contextPath}/product/productSearchProduct/getAll_By_Cond", // 資料請求的網址
 										type : "POST", // GET | POST | PUT | DELETE | PATCH
 										data : "storeID="+$("#searchSID").val()+"&productID="+$("#searchPID").val()
-											+"&productSecID="+$("#searchPSID").val()+"&productStatus="+$("#searchPSTATUS").val(),
+											+"&productSecID="+$("#searchPSID").val()+"&productStatus="+$("#searchPSTATUS").val()
+											+"&productStock="+$("#searchPStock").val()+"&productStock2="+$("#searchPStock2").val()
+											+"&productPrice="+$("#searchPPrice").val()+"&productPrice2="+$("#searchPPrice2").val()
+											+"&productName="+$("#searchPName").val(),
 										dataType : "json", // 預期會接收到回傳資料的格式： json | xml | html
 										success : function(data) {
 											// request 成功取得回應後執行
 											console.log(data);
 											aaa(data);
 											//console.log(str);
-											//console.log(data[0].productID+"哭啊");
+											//console.log(data[0].productID+" 測試");
 											console.log(data.length);
 											$("#searchRes").html("<h2>搜尋結果總共有"+data.length+"筆</h2>"+template+str+str2);
 										},
@@ -130,11 +207,15 @@
 						});
 	});
 </script>
-<!-- 企鵝結束 -->
+<style>
+.error{
+	color:red;
+}
+</style>
 </head>
 
 <body>
-<%@ include file="Header.jsp"%>
+	<%@ include file="Header.jsp"%>
 	<!-- My Account Start -->
 	<div class="my-account">
 		<div class="container-fluid">
@@ -153,14 +234,13 @@
 							class="fa fa-map-marker-alt"></i>我的商品</a> <a class="nav-link"
 							id="account-nav" data-toggle="pill" href="#addProduct" role="tab"><i
 							class="fa fa-user"></i>新增商品</a> <a class="nav-link"><i
-							class="fa fa-user"></i>財務管理</a> <a class="nav-link"
-							id="account-nav" data-toggle="pill" href="#orderQuery" role="tab"><i
+							class="fa fa-user"></i>財務管理</a> <a class="nav-link" id="account-nav"
+							data-toggle="pill" href="#orderQuery" role="tab"><i
 							class="fa fa-user"></i>查詢訂單</a> <a class="nav-link"><i
-							class="fa fa-user"></i>客服中心</a> <a class="nav-link"
-							id="account-nav" data-toggle="pill" href="#account-tab"
-							role="tab"><i class="fa fa-user"></i>平台幫助中心</a> <a
-							class="nav-link" href="index.html"><i
-							class="fa fa-sign-out-alt"></i>Logout</a>
+							class="fa fa-user"></i>客服中心</a> <a class="nav-link" id="account-nav"
+							data-toggle="pill" href="#account-tab" role="tab"><i
+							class="fa fa-user"></i>平台幫助中心</a> <a class="nav-link"
+							href="index.html"><i class="fa fa-sign-out-alt"></i>Logout</a>
 					</div>
 				</div>
 				<div class="col-md-9">
@@ -216,7 +296,7 @@
 						</div>
 						<div class="tab-pane fade" id="storeintroduction" role="tabpanel"
 							aria-labelledby="address-nav">
-							<form
+							<form id="storeForm"
 								action="${pageContext.request.contextPath}/store/storeServlet">
 								<div class="col-sm-12">
 									<div>
@@ -265,15 +345,34 @@
 						<div class="tab-pane fade" id="myProduct" role="tabpanel"
 							aria-labelledby="address-nav">
 							<div>
-								請輸入商品ID <input type="text" id="searchPID" name="productID"
-									value="" /> 請輸入商品次分類ID <input type="text" id="searchPSID"
-									name="productSecID" value="" /> 請輸入商品狀態: <select
-									class="form-select mb-3" aria-label="Default select example"
-									name="productStatus" id="searchPSTATUS">
+								<div class="col-sm-12">
+									<label>請輸入商品名稱</label> <input type="text" id="searchPName"
+										name="productName" value="" />
+								</div>
+								<div class="col-sm-12">
+									<label>請輸入商品ID</label> <input type="text" id="searchPID"
+										name="productID" value="" /> <label>請輸入商品次分類ID</label> <input
+										type="text" id="searchPSID" name="productSecID" value="" />
+								</div>
+								<div class="col-sm-12">
+									<label>請輸入商品庫存 大於等於</label> <input type="text" id="searchPStock"
+										name="productStock" value="" /> <label>請輸入商品庫存 小於等於</label> <input
+										type="text" id="searchPStock2" name="productStock2" value="" />
+								</div>
+								<div class="col-sm-12">
+									<label>請輸入商品價格 大於等於</label> <input type="text" id="searchPPrice"
+										name="productPrice" value="" /> <label>請輸入商品價格 小於等於</label> <input
+										type="text" id="searchPPrice2" name="productPrice2" value="" />
+								</div>
+								<div class="col-sm-12">
+								<label>請輸入商品狀態:</label> <select class="form-select mb-3"
+									aria-label="Default select example" name="productStatus"
+									id="searchPSTATUS">
 									<option selected value="true">已上架</option>
 									<option value="false">已下架</option>
 								</select> <input type="hidden" name=storeID id="searchSID"
 									value="${storeVO2.storeID}" />
+								</div>
 								<button id="btnSearchAll">商品查詢</button>
 							</div>
 							<br />
@@ -351,13 +450,13 @@
 									action="${pageContext.request.contextPath}/product/productServlet/insert"
 									method="post" id="the_form" enctype="multipart/form-data">
 									<div>
-										<label>商品名稱：</label> <input type="text" id="p_name"
+										<label for="p_name">商品名稱：</label> <input type="text" id="p_name"
 											class="form-control" name="productName" />
 									</div>
 									<div>
 										商品次分類： <select class="form-select mb-3"
 											aria-label="Default select example" name="productSecID">
-											<option selected>請選擇</option>
+											<option value="" selected>請選擇</option>
 											<c:forEach var="productSecVO" items="${ProductSec}">
 												<option value="${productSecVO.productSecID}">${productSecVO.productSecName}</option>
 											</c:forEach>
@@ -365,12 +464,12 @@
 									</div>
 
 									<div>
-										<label>商品數量：</label> <input type="text" min="1" max="100"
-											value="1" id="p_count" class="form-control"
+										<label>商品數量：</label> <input type="text" min="1" max="100000"
+											value="" id="p_count" class="form-control"
 											name="productStock" /> <span id="p_count_value"></span>
 									</div>
 									<div>
-										<label>商品價格：</label> <input type="text" value="1" id="p_count"
+										<label>商品價格：</label> <input type="text" value="" id="p_count"
 											class="form-control" name="productPrice" /> <span
 											id="p_count_value"></span>
 									</div>
@@ -394,7 +493,7 @@
 									<div>
 										商品狀態 <select class="form-select mb-3"
 											aria-label="Default select example" name="productStatus">
-											<option selected>請選擇</option>
+											<option value="" selected>請選擇</option>
 											<option value="1">已上架</option>
 											<option value="0">未上架</option>
 										</select>
@@ -418,7 +517,6 @@
 	<a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
 
 	<!-- JavaScript Libraries -->
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<script
 		src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 	<script

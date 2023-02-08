@@ -24,8 +24,13 @@ public class ProductSearchProduct {
 	@PostMapping("/getAll_By_Cond")
 	public List<ProductVO> getAllByCond(Model model,
 			String storeID,
+			@RequestParam(value = "productName", required = false) String productName,
 			@RequestParam(value = "productID", required = false) String productIDStr,
 			@RequestParam(value = "productSecID", required = false) String productSecIDStr,
+			@RequestParam(value = "productStock", required = false) String productStockStr,
+			@RequestParam(value = "productStock2", required = false) String productStockStr2,
+			@RequestParam(value = "productPrice", required = false) String productPriceStr,
+			@RequestParam(value = "productPrice2", required = false) String productPriceStr2,
 			String productStatus) {
 
 		// 錯誤處理
@@ -38,6 +43,11 @@ public class ProductSearchProduct {
 		/* 1. 請求參數的格式整理 */
 
 		queryString.put("storeID", storeID);
+		
+		// 只要productName不是空值
+		if(!productName.isEmpty()) {
+			queryString.put("productName", productName);
+		}
 
 		Integer productID = null;
 		try {
@@ -47,10 +57,42 @@ public class ProductSearchProduct {
 
 		}
 
+		Integer productStock = null;
+		try {
+			productStock = Integer.valueOf(productStockStr.trim());
+			queryString.put("productStock", productStock + "");
+		} catch (Exception e) {
+
+		}
+		
+		Integer productStock2 = null;
+		try {
+			productStock2 = Integer.valueOf(productStockStr2.trim());
+			queryString.put("productStock2", productStock2 + "");
+		} catch (Exception e) {
+
+		}
+		
 		Integer productSecID = null;
 		try {
 			productSecID = Integer.valueOf(productSecIDStr.trim());
 			queryString.put("productSecID", productSecID + "");
+		} catch (Exception e) {
+
+		}
+		
+		Integer productPrice = null;
+		try {
+			productPrice = Integer.valueOf(productPriceStr.trim());
+			queryString.put("productPrice", productPrice + "");
+		} catch (Exception e) {
+
+		}
+		
+		Integer productPrice2 = null;
+		try {
+			productPrice2 = Integer.valueOf(productPriceStr2.trim());
+			queryString.put("productPrice2", productPrice2 + "");
 		} catch (Exception e) {
 
 		}
