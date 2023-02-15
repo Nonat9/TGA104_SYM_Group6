@@ -1,89 +1,37 @@
 package com.group6.tibame104.store.controller;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.UnavailableException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@WebServlet("/store/storePic")
-public class StorePic extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	Connection con;
+import com.group6.tibame104.store.service.StoreService;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
+@RestController
+@RequestMapping("/store/storePic")
+public class StorePic {
+	@Autowired
+	private StoreService storeSvc;
 
-		res.setContentType("image/gif");
-		ServletOutputStream out = res.getOutputStream();
-		String storeID = req.getParameter("storeID");
-		Statement stmt = null;
-		ResultSet rs = null;
+	@GetMapping("/get")
+	public byte[] getOneForDisplay(Model model, @RequestParam("storeID") String storeIDstr) {
+		/* 錯誤處理 */
+		Map<String, String> errorMsgs = new HashMap<String, String>();
+		model.addAttribute("errorMsgs", errorMsgs);
+
 		try {
-			stmt = con.createStatement();
-			rs = stmt.executeQuery(
-				"SELECT storePhoto FROM store WHERE storeID="+storeID);
-
-			if (rs.next()) {
-				if(rs.getBinaryStream("storePhoto")!=null) {
-					BufferedInputStream in = new BufferedInputStream(rs.getBinaryStream("storePhoto"));
-					byte[] buf = new byte[4 * 1024]; // 4K buffer
-					int len;
-					while ((len = in.read(buf)) != -1) {
-						out.write(buf, 0, len);
-					}
-					in.close();
-				}
-			} else {
-				res.sendError(HttpServletResponse.SC_NOT_FOUND);
-			}
+			Integer storeID = Integer.valueOf(storeIDstr);
+			return storeSvc.findPic(storeID);
 		} catch (Exception e) {
-			System.out.println(e);
-		}finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException se) {
-					se.printStackTrace(System.err);
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException se) {
-					se.printStackTrace(System.err);
-				}
-			}
-		}
-	}
 
-	public void init() throws ServletException {
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/db06_sym", "root", "password");
-		} catch (ClassNotFoundException e) {
-			throw new UnavailableException("Couldn't load JdbcOdbcDriver");
-		} catch (SQLException e) {
-			throw new UnavailableException("Couldn't get db connection");
 		}
-	}
+		return null;
 
-	public void destroy() {
-		try {
-			if (con != null) con.close();
-		} catch (SQLException e) {
-			System.out.println(e);
-		}
 	}
 
 }

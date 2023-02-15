@@ -320,15 +320,14 @@ cart.addEventListener('click', (event) => {
 								<ul class="nav nav-pills nav-justified align-items-center"
 									id="account-sv" style='height: 70px;'>
 									<li class="nav-item col-lg-2"> <img  class="rounded-circle"
-											src="${pageContext.request.contextPath}/store/storePic?storeID=${categoryVO.storeID}"
+											src="${pageContext.request.contextPath}/store/storePic/get?storeID=${categoryVO.storeID}"
 											 alt="沒惹" style="width: 45px; height: 45px; object-fit: cover"
 											sizes="(max-width: 100px) 50px, 1vw" />
 											
 									</li>
 									${categoryVO.storeName} &emsp;&emsp;&emsp;&emsp;
 										<a class="btn"
-										href="${pageContext.request.contextPath}
-										 		/store/productStoreServlet?storeID=${categoryVO.storeID}">查看賣場</a>
+										href="${pageContext.request.contextPath}/store/productStoreServlet?storeID=${categoryVO.storeID}">查看賣場</a>
 									<li class="nav-item col-lg-21">賣場地址:${categoryVO.storeAddress}<br>
 										 聯絡電話:${categoryVO.phoneNumber}
 									</li>

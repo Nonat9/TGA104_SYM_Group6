@@ -75,7 +75,7 @@ $().ready(function() {
 				productPrice:{
 					required:"請輸入商品價格",
 					min:"商品價格最小值為1",
-					max:"商品價格最大直為1000000"
+					max:"商品價格最大值為1000000"
 		      	},
 		    	productDesc:"請輸入商品描述",
 		    	source:"請輸入商品出貨地",

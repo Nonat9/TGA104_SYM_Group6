@@ -22,19 +22,17 @@ public class ProductSearchProduct {
 	private ProductService productSvc;
 
 	@PostMapping("/getAll_By_Cond")
-	public List<ProductVO> getAllByCond(Model model,
-			String storeID,
+	public List<ProductVO> getAllByCond(Model model, String storeID,
 			@RequestParam(value = "productName", required = false) String productName,
 			@RequestParam(value = "productID", required = false) String productIDStr,
 			@RequestParam(value = "productSecID", required = false) String productSecIDStr,
 			@RequestParam(value = "productStock", required = false) String productStockStr,
 			@RequestParam(value = "productStock2", required = false) String productStockStr2,
 			@RequestParam(value = "productPrice", required = false) String productPriceStr,
-			@RequestParam(value = "productPrice2", required = false) String productPriceStr2,
-			String productStatus) {
+			@RequestParam(value = "productPrice2", required = false) String productPriceStr2, String productStatus) {
 
 		// 錯誤處理
-		Map<String,String> errorMsgs = new HashMap<String, String>();
+		Map<String, String> errorMsgs = new HashMap<String, String>();
 		model.addAttribute("errorMsgs", errorMsgs);
 
 		/* queryString */
@@ -43,9 +41,9 @@ public class ProductSearchProduct {
 		/* 1. 請求參數的格式整理 */
 
 		queryString.put("storeID", storeID);
-		
+
 		// 只要productName不是空值
-		if(!productName.isEmpty()) {
+		if (productName != null && (!productName.isEmpty())) {
 			queryString.put("productName", productName);
 		}
 
@@ -64,7 +62,7 @@ public class ProductSearchProduct {
 		} catch (Exception e) {
 
 		}
-		
+
 		Integer productStock2 = null;
 		try {
 			productStock2 = Integer.valueOf(productStockStr2.trim());
@@ -72,7 +70,7 @@ public class ProductSearchProduct {
 		} catch (Exception e) {
 
 		}
-		
+
 		Integer productSecID = null;
 		try {
 			productSecID = Integer.valueOf(productSecIDStr.trim());
@@ -80,7 +78,7 @@ public class ProductSearchProduct {
 		} catch (Exception e) {
 
 		}
-		
+
 		Integer productPrice = null;
 		try {
 			productPrice = Integer.valueOf(productPriceStr.trim());
@@ -88,7 +86,7 @@ public class ProductSearchProduct {
 		} catch (Exception e) {
 
 		}
-		
+
 		Integer productPrice2 = null;
 		try {
 			productPrice2 = Integer.valueOf(productPriceStr2.trim());

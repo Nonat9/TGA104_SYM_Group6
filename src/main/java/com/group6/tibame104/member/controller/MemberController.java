@@ -38,6 +38,7 @@ import com.group6.tibame104.shoppingGoldRecord.model.ShoppingGoldRecordService;
 import com.group6.tibame104.shoppingGoldRecord.model.ShoppingGoldRecordVO;
 import com.group6.tibame104.store.model.StoreJDBCDAO;
 import com.group6.tibame104.store.model.StoreVO;
+import com.group6.tibame104.store.service.StoreService;
 
 import redis.clients.jedis.Jedis;
 
@@ -58,8 +59,10 @@ public class MemberController {
 	private CouponUsageHistoryService couponUsageHistorySvc;
 	@Autowired
 	private ShoppingGoldRecordService shoppingGoldRecordSvc;
+	@Autowired
+	private StoreService storeSvc;
 	private Integer memberID;
-	
+
 	@PostMapping("/getOneForDisplay")
 	public String getOneForDisplay(Model model, @RequestParam("memberID") Integer memberID) {
 
@@ -519,13 +522,12 @@ public class MemberController {
 				List<CreditCardVO> cardVO = cardSvc.getAll(memVO.getMemberID());
 				session.setAttribute("cardVO", cardVO);// 資料庫取出的storeVO物件,存入req
 				session.setAttribute("memblVO", memblVO);// 資料庫取出的storeVO物件,存入req
-				StoreJDBCDAO storeJDBCDAO = new StoreJDBCDAO();
-				StoreVO storeVO2 = storeJDBCDAO.findByPrimaryKey(memVO.getMemberID());
+				StoreVO storeVO2 = storeSvc.findByPrimaryKey(memVO.getMemberID());
 				List<CouponUsageHistoryVO> couponUsageHistoryVO = couponUsageHistorySvc.getAll2();
 				session.setAttribute("couponUsageHistoryVO", couponUsageHistoryVO);
 				List<ShoppingGoldRecordVO> shoppingGoldRecordVO = shoppingGoldRecordSvc.getAll();
 				session.setAttribute("shoppingGoldRecordVO", shoppingGoldRecordVO);
-				
+
 				// 有賣場名稱才執行
 				if (storeVO2 != null && storeVO2.getStoreName() != null) {
 					String storeName = storeVO2.getStoreName();
@@ -642,7 +644,6 @@ public class MemberController {
 			@RequestParam("storeName") String storeName, @RequestParam("storeAddress") String storeAddress) {
 
 		StoreVO storeVO = new StoreVO();
-		StoreJDBCDAO dao = new StoreJDBCDAO();
 
 		storeVO.setMemberID(memberID);
 		storeVO.setStoreDelBankCode(storeDelBankCode);
@@ -655,7 +656,7 @@ public class MemberController {
 		// Send the use back to the form, if there were errors
 		/*************************** 2.開始修改資料 *****************************************/
 
-		dao.insert(storeVO);
+		storeSvc.insert(storeVO);
 
 		/*************************** 3.修改完成,準備轉交(Send the Success view) *************/
 		session.setAttribute("storeName", storeName);

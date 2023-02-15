@@ -1,14 +1,10 @@
-package com.group6.tibame104.store.model;
+package com.group6.tibame104.store.service;
 
 import java.util.List;
 
-public interface StoreDAO_interface {
-	/*
-	 * 前台 
-	 * 1.修改商場 
-	 * 2.List 1
-	 *
-	 */
+import com.group6.tibame104.store.model.StoreVO;
+
+public interface StoreService_interface {
 
 	public void update(StoreVO storeVO);
 

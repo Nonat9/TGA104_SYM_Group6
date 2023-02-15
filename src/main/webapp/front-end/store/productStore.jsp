@@ -97,7 +97,7 @@
 			$
 			.ajax({
 				url : "${pageContext.request.contextPath}/product/productSearchProduct/getAll_By_Cond?storeID="+$("#psStoreID").val()+"&productStatus=1", // 資料請求的網址
-				type : "GET", // GET | POST | PUT | DELETE | PATCH
+				type : "POST", // GET | POST | PUT | DELETE | PATCH
 				dataType : "json", // 預期會接收到回傳資料的格式： json | xml | html
 				success : function(data) {
 					// request 成功取得回應後執行
@@ -214,7 +214,7 @@
 				<div class="col-lg-6">
 					<div class="contact-info">
 						<h2>${storeVO.storeName}</h2>
-						<h2><img src="${pageContext.request.contextPath}/store/storePic?storeID=${storeVO.storeID}"
+						<h2><img src="${pageContext.request.contextPath}/store/storePic/get?storeID=${storeVO.storeID}"
         						alt="沒有圖片" width="400" height="200"></h2>
 					</div>
 				</div>

@@ -296,8 +296,8 @@ $().ready(function() {
 						</div>
 						<div class="tab-pane fade" id="storeintroduction" role="tabpanel"
 							aria-labelledby="address-nav">
-							<form id="storeForm"
-								action="${pageContext.request.contextPath}/store/storeServlet">
+							<form id="storeForm" method="post"
+								action="${pageContext.request.contextPath}/store/storeServlet/update">
 								<div class="col-sm-12">
 									<div>
 										<h2>賣場基本資料</h2>
@@ -337,7 +337,6 @@ $().ready(function() {
 									</div>
 									<div>
 										<input type="submit" class="btn btn-secondary m-2" value="修改" />
-										<input type="hidden" name="action" value="update">
 									</div>
 								</div>
 							</form>
